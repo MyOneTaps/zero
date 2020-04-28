@@ -1,0 +1,49 @@
+## Interface: 80000
+## Title: Zero
+## Notes: General improvements to the default Blizzard UI
+## Version: 0.1
+## Author: Simone
+## RequiredDeps: Blizzard_CombatText
+## SavedVariables: ZeroDB
+
+core.lua
+db.lua
+fonts.lua
+
+libs\iteminfo.lua
+libs\fader.lua
+
+modules\fonts.lua
+modules\farclip.lua
+modules\errors.lua
+modules\autoroll.lua
+modules\bank.lua
+modules\castbars.lua
+modules\chat.lua
+modules\cvars.lua
+modules\delete.lua
+modules\duels.lua
+modules\fct.lua
+modules\fishing.lua
+modules\items.lua
+modules\loot.lua
+modules\minimap.lua
+modules\map.lua
+modules\nameplates.lua
+modules\quest_itembar.lua
+modules\quest_sounds.lua
+modules\quest_tracker.lua
+modules\repair.lua
+modules\reputation.lua
+modules\resurrect.lua
+modules\selljunk.lua
+modules\tooltip.lua
+modules\unitframes.lua
+modules\screenshots.lua
+modules\buffs.lua
+modules\picomenu.xml
+modules\buttons.lua
+
+modules\actionbars.lua
+#modules\xp.lua
+#modules\quest_count.lua
