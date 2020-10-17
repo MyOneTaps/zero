@@ -1,26 +1,20 @@
-local _, Zero = ...
+  local _, Zero = ...
 
 local module = Zero.Module('Map')
-
-local MINIMAP_STYLE = {
-  bgFile = 'Interface/Tooltips/UI-Tooltip-Background',
-  tile = true,
-  tileSize = 16,
-  backdropColor = TOOLTIP_DEFAULT_BACKGROUND_COLOR,
-}
 
 local worldMapCoordsFrame, minimapCoordsFrame
 
 local function GetPlayerPosition()
   local mapID = C_Map.GetBestMapForUnit('player')
-  if mapID then
-    local pos = C_Map.GetPlayerMapPosition(mapID, 'player')
-    if pos then
-      local x, y = pos:GetXY()
-      return floor((1000 * x + 0.5)) / 10, floor((1000 * y + 0.5)) / 10
-    end
+  if not mapID then
+    return 0, 0
   end
-  return 0, 0
+  local pos = C_Map.GetPlayerMapPosition(mapID, 'player')
+  if not pos then
+    return 0, 0
+  end
+  local x, y = pos:GetXY()
+  return floor((1000 * x + 0.5)) / 10, floor((1000 * y + 0.5)) / 10
 end
 
 local function GetCursorPosition()
@@ -33,20 +27,39 @@ local function GetCursorPosition()
   return 0, 0
 end
 
+local minimapTimeSinceUpdate = 0
 local isInInstance
-local function UpdateMinimapCoords()
-  if isInInstance then
-    isInInstance = IsInInstance()
-  elseif IsInInstance() then
+local lastMiniMapX, lastMiniMapY
+local function UpdateMinimapCoords(self, elapsed)
+  minimapTimeSinceUpdate = minimapTimeSinceUpdate + elapsed
+  if minimapTimeSinceUpdate < 0.25 then return end
+  minimapTimeSinceUpdate = 0
+
+  if isInInstance and not IsInInstance() then
+    isInInstance = false
+  elseif not isInInstance and IsInInstance() then
     isInInstance = true
     minimapCoordsFrame.text:SetText('')
   else
     local x, y = GetPlayerPosition()
-    minimapCoordsFrame.text:SetFormattedText('%1.1f : %1.1f', x, y)
+    if lastMiniMapX == nil
+      or lastMiniMapY == nil
+      or math.abs(lastMiniMapX - x) > 0.1
+      or math.abs(lastMiniMapY - y) > 0.1 then
+      minimapCoordsFrame.text:SetFormattedText('%1.1f : %1.1f', x, y)
+      lastMiniMapX, lastMiniMapY = x, y
+    end
   end
 end
 
+local mapTimeSinceUpdate = 0
+local lastMapCursorX, lastMapCursorY
+local lastMapPlayerX, lastMapPlayerY
 local function UpdateWorldMapCoords(self, elapsed)
+  mapTimeSinceUpdate = mapTimeSinceUpdate + elapsed
+  if mapTimeSinceUpdate < 0.1 then return end
+  mapTimeSinceUpdate = 0
+
   if isInInstance and not IsInInstance() then
     isInInstance = false
   elseif not isInInstance and IsInInstance() then
@@ -56,15 +69,27 @@ local function UpdateWorldMapCoords(self, elapsed)
     return
   end
   local cx, cy = GetCursorPosition()
-  worldMapCoordsFrame.cursorText:SetFormattedText('C: %1.1f : %1.1f', cx, cy)
+  if lastMapCursorX == nil
+      or lastMapCursorY == nil
+      or math.abs(lastMapCursorX - cx) > 0.1
+      or math.abs(lastMapCursorY - cy) > 0.1 then
+    worldMapCoordsFrame.cursorText:SetFormattedText('C: %1.1f : %1.1f', cx, cy)
+    lastMapCursorX, lastMapCursorY = cx, cy
+  end
   local px, py = GetPlayerPosition()
-  worldMapCoordsFrame.playerText:SetFormattedText('P: %1.1f : %1.1f', px, py)
+  if lastMapPlayerX == nil
+      or lastMapPlayerY == nil
+      or math.abs(lastMapPlayerX - px) > 0.1
+      or math.abs(lastMapPlayerY - py) > 0.1 then
+    worldMapCoordsFrame.playerText:SetFormattedText('P: %1.1f : %1.1f', px, py)
+    lastMapPlayerX, lastMapPlayerY = px, py
+  end
 end
 
 function module:OnPlayerLogin()
   worldMapCoordsFrame = CreateFrame('Frame', 'Zero_WorldMapCoordsFrame', WorldMapFrame)
   worldMapCoordsFrame:SetSize(100, 32)
-  worldMapCoordsFrame:SetPoint('BOTTOMLEFT', WorldMapFrame.BorderFrame, 'BOTTOMLEFT', 10, 10)
+  worldMapCoordsFrame:SetPoint('BOTTOMRIGHT', WorldMapFrame.BorderFrame, 'BOTTOMRIGHT', -10, 10)
   worldMapCoordsFrame:SetFrameStrata('HIGH')
   worldMapCoordsFrame.cursorText = worldMapCoordsFrame:CreateFontString(nil, 'OVERLAY', 'GameFontNormalSmallLeft')
   worldMapCoordsFrame.cursorText:SetPoint('TOPLEFT')

@@ -27,7 +27,7 @@ local function SellJunk(self)
       end
     end
     if c > 0 then
-      print('Vendored gray items for: ' .. Zero.FormatMoney(c))
+      print('Sold gray items for: ' .. Zero.FormatMoney(c))
     end
     selling = false
   end)

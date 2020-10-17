@@ -1,6 +1,0 @@
-## Interface: 80000
-## Title: InfoStrip
-## Notes: Lite weight data bar
-## SavedVariables: Infostrip
-
-InfoStrip.lua

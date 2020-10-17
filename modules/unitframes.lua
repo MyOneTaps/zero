@@ -17,7 +17,7 @@ end
 local function UpdateUnitFrames()
   SetUnitFrame(PlayerFrame, -265, 250)
   SetUnitFrame(TargetFrame, 265, 250)
-  TargetFrame.buffsOnTop = true
+  -- TargetFrame.buffsOnTop = true
 end
 
 function module:OnPlayerLogin()

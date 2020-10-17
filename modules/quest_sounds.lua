@@ -3,8 +3,7 @@ local _, Zero = ...
 local module = Zero.Module('QuestSounds')
 
 local SOUNDS = {
-  MORE_WORK = [[Sound\Creature\Peasant\PeasantWhat3.ogg]],
-  JOBS_DONE = [[Interface\AddOns\Zero\media\SOUNDS\Jobs Done.ogg]]
+  DING = [[Interface\AddOns\Zero\media\sounds\Ding.ogg]]
 }
 
 local firstScan = true
@@ -13,49 +12,26 @@ local completed, oldCompleted = {}, {}
 
 local function ProcessQuest(questIndex)
 
-  SelectQuestLogEntry(questIndex)
+  C_QuestLog.SetSelectedQuest(questIndex)
 
-  local title, _, _, isHeader, _, isComplete, _, questID, _, _, _, _, isTask = GetQuestLogTitle(questIndex)
-  if isHeader then return end
+  local info = C_QuestLog.GetInfo(questIndex)
+  if info.isHeader then return end
 
-  quests[questID] = true
+  quests[info.questID] = true
 
-  local numObjectives = GetNumQuestLeaderBoards(index)
+  local isComplete = C_QuestLog.IsComplete(info.questID)
+  local numObjectives = C_QuestLog.GetNumQuestObjectives(info.questID)
   if isComplete or numObjectives == 0 then
-    completed[questID] = true
-    if not firstScan and not oldCompleted[questID] then
+    completed[info.questID] = true
+    if not firstScan and not oldCompleted[info.questID] then
       if isComplete == -1 then
-        UIErrorsFrame:AddMessage(ERR_QUEST_FAILED_S:format(title), 1, 0, 0)
+        UIErrorsFrame:AddMessage(ERR_QUEST_FAILED_S:format(info.title), 1, 0, 0)
       else
-        UIErrorsFrame:AddMessage(ERR_QUEST_COMPLETE_S:format(title), 0, 1, 0)
-        ChatFrame1:AddMessage(ERR_QUEST_COMPLETE_S:format(title), 0, 1, 0)
-        PlaySoundFile(SOUNDS.JOBS_DONE)
-        if IsQuestWatched(questIndex) then
-          RemoveQuestWatch(questIndex)
-        end
+        UIErrorsFrame:AddMessage(ERR_QUEST_COMPLETE_S:format(info.title), 0, 1, 0)
+        ChatFrame1:AddMessage(ERR_QUEST_COMPLETE_S:format(info.title), 0, 1, 0)
+        PlaySoundFile(SOUNDS.DING)
       end
     end
-  end
-
-  local function ProcessObjective(objectiveIndex)
-    local _, _, finished = GetQuestLogLeaderBoard(objectiveIndex, questIndex)
-
-    local key = ('%d:%d'):format(questID, objectiveIndex)
-
-    if finished then
-      completed[key] = true
-    end
-
-    if firstScan then return end
-    if completed[questID] or oldCompleted[key] then return end
-    if not finished then return end
-    if isTask and not oldQuests[questID] then return end
-    PlaySoundFile(SOUNDS.MORE_WORK)
-  end
-
-  local numObjectives = GetNumQuestLeaderBoards(questIndex)
-  for objectiveIndex = 1, numObjectives do
-    ProcessObjective(objectiveIndex)
   end
 end
 
@@ -68,13 +44,13 @@ local function ProcessQuestLog()
   wipe(oldQuests)
   completed, oldCompleted = oldCompleted, completed
   quests, oldQuests = oldQuests, quests
-  local startingQuestLogSelection = GetQuestLogSelection()
-  local numEntries = GetNumQuestLogEntries()
+  local startingQuestLogSelection = C_QuestLog.GetSelectedQuest()
+  local numEntries = C_QuestLog.GetNumQuestLogEntries()
   for index = 1, numEntries do
     ProcessQuest(index)
   end
   firstScan = numEntries < 1
-  SelectQuestLogEntry(startingQuestLogSelection)
+  C_QuestLog.SetSelectedQuest(startingQuestLogSelection)
   blockProcess = false
 end
 

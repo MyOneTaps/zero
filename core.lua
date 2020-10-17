@@ -14,26 +14,29 @@ do
   local coroutines = {}
   local hooks = {}
 
-  local dead_coroutines = {}
+  local deadCoroutines = {}
   frame:SetScript('OnUpdate', function()
-    wipe(dead_coroutines)
     for thread, alive in pairs(coroutines) do
       if not alive or coroutine.status(thread) == 'dead' then
-        dead_coroutines[#dead_coroutines + 1] = thread
+        deadCoroutines[#deadCoroutines + 1] = thread
       else
         coroutine.resume(thread)
       end
     end
-    for _, thread in ipairs(dead_coroutines) do
-      coroutines[thread] = nil
+    if #deadCoroutines > 0 then
+      for i = 1, #deadCoroutines do
+        local thread = deadCoroutines[i]
+        coroutines[thread] = nil
+        deadCoroutines[i] = nil
+      end
     end
   end)
 
   local function ProcessQueue()
-    for func in pairs(invokeAfterCombat) do
-      func()
+    for i = 1, #invokeAfterCombat do
+      invokeAfterCombat[i]()
+      invokeAfterCombat[i] = nil
     end
-    wipe(invokeAfterCombat)
   end
 
   local nestingLevel = 0
@@ -237,7 +240,7 @@ do
     end
     if not func then return end
     if InCombatLockdown() then
-      invokeAfterCombat[func] = true
+      invokeAfterCombat[#invokeAfterCombat + 1] = func
     else
       func()
     end

@@ -2,6 +2,8 @@ local _, Zero = ...
 
 local module = Zero.Module('Chat')
 
+local FontSize = 10
+
 local function UpdatePosition(i, chatFrame)
   chatFrame = chatFrame or _G[format('ChatFrame%s', i)]
   if i == 1 then
@@ -32,7 +34,7 @@ local function SetupChat()
   BNToastFrame:SetClampRectInsets(-15,15,15,-15)
 
   -- Change Edit Box Font
-  ChatFontNormal:SetFont(STANDARD_TEXT_FONT, 12, 'THINOUTLINE')
+  ChatFontNormal:SetFont(ZERO_UI_FONT, FontSize, 'THINOUTLINE')
   ChatFontNormal:SetShadowOffset(1,-1)
   ChatFontNormal:SetShadowColor(0,0,0,0.6)
 
@@ -66,7 +68,7 @@ local function SetupChat()
     local tab = _G[chatFrameName..'Tab'];
     local tabFont = tab:GetFontString();
     tab:SetAlpha(1)
-    tabFont:SetFont(STANDARD_TEXT_FONT, 12, 'THINOUTLINE');
+    tabFont:SetFont(ZERO_UI_FONT, FontSize, 'THINOUTLINE');
     tabFont:SetShadowOffset( 1, -1 );
     tabFont:SetShadowColor( 0, 0, 0, 0.6 );
 
@@ -101,7 +103,7 @@ local function SetupChat()
     _G[chatFrameName..'EditBox']:SetPoint('RIGHT',_G[chatFrameName],10,0);
 
     -- Change Chat Font
-    _G[chatFrameName]:SetFont(STANDARD_TEXT_FONT, size, 'THINOUTLINE');
+    _G[chatFrameName]:SetFont(ZERO_UI_FONT, FontSize, 'THINOUTLINE');
     _G[chatFrameName]:SetShadowOffset( 1, -1 );
     _G[chatFrameName]:SetShadowColor( 0, 0, 0, 0.6 )
 
