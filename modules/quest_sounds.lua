@@ -2,8 +2,10 @@ local _, Zero = ...
 
 local module = Zero.Module('QuestSounds')
 
-local SOUNDS = {
-  DING = [[Interface\AddOns\Zero\media\sounds\Ding.ogg]]
+local Sounds = {
+  QUEST_COMPLETE = 558132,
+  OBJECTIVE_COMPLETE = 558137,
+  OBJECTIVE_PROGRESS = 558127,
 }
 
 local firstScan = true
@@ -29,7 +31,7 @@ local function ProcessQuest(questIndex)
       else
         UIErrorsFrame:AddMessage(ERR_QUEST_COMPLETE_S:format(info.title), 0, 1, 0)
         ChatFrame1:AddMessage(ERR_QUEST_COMPLETE_S:format(info.title), 0, 1, 0)
-        PlaySoundFile(SOUNDS.DING)
+        PlaySoundFile(Sounds.QUEST_COMPLETE)
       end
     end
   end
