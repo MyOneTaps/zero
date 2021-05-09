@@ -2,37 +2,82 @@ local _, Zero = ...
 
 local module = Zero.Module('SellJunk')
 
-local selling = false
-local function SellJunk(self)
-  if selling then return end
-  selling = true
-  self:StartCoroutine(function()
-    local c = 0
-    local sold = 0
-    for bag = 0, 4 do
-      for slot = 1, GetContainerNumSlots(bag) do
-        local itemLink = GetContainerItemLink(bag, slot)
-        if itemLink then
-          local _, _, quality, _, _, _, _, _, _, _, price = GetItemInfo(itemLink)
-          local _, count = GetContainerItemInfo(bag, slot)
-          if quality == 0 and price ~= 0 then
-            c = c + price * count
-            UseContainerItem(bag, slot)
-            sold = sold + 1
-          end
-          if sold == 4 then
-            coroutine.yield()
-          end
+local merchantFrameShown = false
+
+local function GetJunk()
+  local items = {}
+  for bag = 0, 4 do
+    for slot = 1, GetContainerNumSlots(bag) do
+      local itemLink = GetContainerItemLink(bag, slot)
+      if itemLink then
+        local _, _, quality, _, _, _, _, _, _, _, price = GetItemInfo(itemLink)
+        local _, count = GetContainerItemInfo(bag, slot)
+        if quality == 0 then
+          items[#items+1] = {
+            bag = bag,
+            slot = slot,
+            count = count,
+            price = price,
+          }
         end
       end
     end
-    if c > 0 then
-      print('Sold gray items for: ' .. Zero.FormatMoney(c))
+  end
+  return items
+end
+
+local function scheduleTimer(delay, action, onComplete)
+  local timer = {}
+  timer.delay = delay
+  timer.action = action
+
+  local function callback()
+    if not timer.cancelled and timer.action() then
+      C_Timer.After(delay, callback)
+    elseif onComplete and not timer.completed then
+      timer.completed = true
+      onComplete()
     end
-    selling = false
-  end)
+  end
+
+  C_Timer.After(delay, callback)
+  return timer
+end
+
+local function PrintJunkValue(data)
+  if data.totalPrice > 0 then
+    print('Sold gray items for: ' .. Zero.FormatMoney(data.totalPrice))
+  end
+end
+
+local function SellJunk(data)
+  if #data.items > 0 then
+    local item = table.remove(data.items, #data.items)
+    UseContainerItem(item.bag, item.slot)
+    data.totalPrice = data.totalPrice + item.count * item.price
+  end
+
+  return #data.items > 0
 end
 
 function module:OnPlayerLogin()
-  self:RegisterEvent('MERCHANT_SHOW', SellJunk)
+  MerchantFrame:HookScript('OnShow', function()
+    merchantFrameShown = true
+    local data = {
+      items = GetJunk(),
+      totalPrice = 0
+    }
+    self.timer = scheduleTimer(0.1, function()
+      return SellJunk(data)
+    end, function()
+      PrintJunkValue(data)
+    end)
+  end)
+  MerchantFrame:HookScript('OnHide', function()
+    merchantFrameShown = false
+    if self.timer then
+      self.timer.cancelled = true
+      self.timer = nil
+    end
+  end)
 end
