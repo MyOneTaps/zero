@@ -34,7 +34,7 @@ local function SetupChat()
   BNToastFrame:SetClampRectInsets(-15,15,15,-15)
 
   -- Change Edit Box Font
-  ChatFontNormal:SetFont(ZERO_UI_FONT, FontSize, 'THINOUTLINE')
+  ChatFontNormal:SetFont(ZERO_CHAT_FONT, FontSize, 'THINOUTLINE')
   ChatFontNormal:SetShadowOffset(1,-1)
   ChatFontNormal:SetShadowColor(0,0,0,0.6)
 
@@ -103,7 +103,7 @@ local function SetupChat()
     _G[chatFrameName..'EditBox']:SetPoint('RIGHT',_G[chatFrameName],10,0);
 
     -- Change Chat Font
-    _G[chatFrameName]:SetFont(ZERO_UI_FONT, FontSize, 'THINOUTLINE');
+    _G[chatFrameName]:SetFont(ZERO_CHAT_FONT, FontSize, 'THINOUTLINE');
     _G[chatFrameName]:SetShadowOffset( 1, -1 );
     _G[chatFrameName]:SetShadowColor( 0, 0, 0, 0.6 )
 
