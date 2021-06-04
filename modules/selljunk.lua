@@ -26,24 +26,6 @@ local function GetJunk()
   return items
 end
 
-local function scheduleTimer(delay, action, onComplete)
-  local timer = {}
-  timer.delay = delay
-  timer.action = action
-
-  local function callback()
-    if not timer.cancelled and timer.action() then
-      C_Timer.After(delay, callback)
-    elseif onComplete and not timer.completed then
-      timer.completed = true
-      onComplete()
-    end
-  end
-
-  C_Timer.After(delay, callback)
-  return timer
-end
-
 local function PrintJunkValue(data)
   if data.totalPrice > 0 then
     print('Sold gray items for: ' .. Zero.FormatMoney(data.totalPrice))
@@ -67,7 +49,7 @@ function module:OnPlayerLogin()
       items = GetJunk(),
       totalPrice = 0
     }
-    self.timer = scheduleTimer(0.1, function()
+    self.timer = self:ScheduleTimer(0.1, function()
       return SellJunk(data)
     end, function()
       PrintJunkValue(data)

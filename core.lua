@@ -256,6 +256,31 @@ do
     coroutines[thread] = false
   end
 
+  function prototype:ScheduleTimer(delay, action, onComplete)
+    local timer = {}
+    timer.delay = delay
+    if type(action) == 'function' then
+      timer.action = action
+    else
+      local f = self[action]
+      timer.action = function()
+        f(self)
+      end
+    end
+
+    local function callback()
+      if not timer.cancelled and timer.action() then
+        C_Timer.After(delay, callback)
+      elseif onComplete and not timer.completed then
+        timer.completed = true
+        onComplete()
+      end
+    end
+
+    C_Timer.After(delay, callback)
+    return timer
+  end
+
   function prototype:OnAddOnLoaded(name)
     -- do nothing
   end
