@@ -220,10 +220,10 @@ function CreateButton(index)
   button.cooldown:SetPoint('CENTER', 0, -1)
   button.cooldown:SetSwipeColor(1, 1, 1, 0.8)
 
-  button.questMark = button:CreateTexture(name..'Quest', 'OVERLAY', nil, 1)
+  button.questMark = button:CreateTexture(name..'QuestMark', 'OVERLAY', nil, 1)
   button.questMark:SetTexture(TEXTURE_ITEM_QUEST_BANG);
   button.questMark:Hide()
-  button.questMark:SetSize(37, 38)
+  button.questMark:SetSize(BUTTON_SIZE, BUTTON_SIZE)
   button.questMark:SetPoint('TOP', 0, 0)
 
   button:SetScript('OnEnter', Button_OnEnter)
