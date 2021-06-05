@@ -23,7 +23,6 @@ modules\fishing.lua
 modules\fonts.lua
 modules\items.lua
 modules\loot.lua
-modules\map.lua
 modules\minimap.lua
 modules\nameplates.lua
 modules\quest_sounds.lua
