@@ -15,12 +15,11 @@ local function GetPlayerPosition()
   return floor((1000 * x + 0.5)) / 10, floor((1000 * y + 0.5)) / 10
 end
 
-function module:UpdateMinimapCoords(elapsed)
-
+function module:UpdateMinimapCoords()
   local isInInstance = IsInInstance()
   if isInInstance then
     self.coords.text:SetText('')
-    return
+    return true
   end
 
   local x, y = GetPlayerPosition()
@@ -29,6 +28,8 @@ function module:UpdateMinimapCoords(elapsed)
   else
     self.coords.text:SetText('')
   end
+
+  return true
 end
 
 function module:OnLoad()
@@ -49,5 +50,5 @@ function module:OnLoad()
   coords.text = coords:CreateFontString(nil, 'OVERLAY', 'GameFontWhiteSmall')
   coords.text:SetPoint('CENTER')
   self.coords = coords
-  self:ScheduleTimer(0.5, 'UpdateMinimapCoords')
+  self:ScheduleTimer(1, 'UpdateMinimapCoords')
 end
