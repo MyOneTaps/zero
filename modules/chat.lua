@@ -8,11 +8,11 @@ local function UpdatePosition(i, chatFrame)
   chatFrame = chatFrame or _G[format('ChatFrame%s', i)]
   if i == 1 then
     chatFrame:ClearAllPoints()
-    chatFrame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', 32, 125)
+    chatFrame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', 8, 32)
   elseif i == 3 then
     chatFrame:ClearAllPoints()
     local xOffset = 10 + 45 - 7 + 45
-    chatFrame:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -xOffset, 125)
+    chatFrame:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -xOffset, 32)
   end
   FCF_SavePositionAndDimensions(chatFrame)
   FCF_StopDragging(chatFrame)
