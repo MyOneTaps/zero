@@ -110,7 +110,7 @@ do
   end
 
   local function CreateHook(self, hooks)
-    return function(_, ...)
+    return function(...)
       for hook in pairs(hooks) do
         hook(self, ...)
       end
@@ -154,7 +154,16 @@ do
       SetHooks(target, script, targetHooks)
       target:HookScript(script, CreateHook(self, targetHooks))
     end
-    targetHooks[hook] = true
+    if type(hook) == 'function' then
+      targetHooks[hook] = hook
+    elseif type(hook) == 'string' then
+      local func = self[hook]
+      if type(func) == 'function' then
+        targetHooks[hook] = function(...)
+          func(self, ...)
+        end
+      end
+    end
   end
 
   function prototype:Hook(target, name, hook)
@@ -232,17 +241,24 @@ do
     return IsHooked_Script(target, script, hook)
   end
 
-  function prototype:SafeInvoke(func)
-    if type(func) == 'string' then
-      func = function(...)
-        self[func](self, ...)
-      end
-    end
-    if not func then return end
+  local function safe_invoke(func)
     if InCombatLockdown() then
       invokeAfterCombat[#invokeAfterCombat + 1] = func
     else
       func()
+    end
+  end
+
+  function prototype:SafeInvoke(func)
+    if type(func) == 'function' then
+      safe_invoke(func)
+    elseif type(func) == 'string' then
+      func = self[func]
+      if type(func) == 'function' then
+        safe_invoke(function()
+          func(self)
+        end)
+      end
     end
   end
 
@@ -263,21 +279,28 @@ do
       timer.action = action
     else
       local f = self[action]
-      timer.action = function()
-        f(self)
+      if type(f) == 'function' then
+        timer.action = function()
+          return f(self)
+        end
       end
     end
 
-    local function callback()
+    if not timer.action then
+      return
+    end
+
+
+    timer.callback = function()
       if not timer.cancelled and timer.action() then
-        C_Timer.After(delay, callback)
+        C_Timer.After(delay, timer.callback)
       elseif onComplete and not timer.completed then
         timer.completed = true
         onComplete()
       end
     end
 
-    C_Timer.After(delay, callback)
+    C_Timer.After(delay, timer.callback)
     return timer
   end
 
