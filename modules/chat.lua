@@ -9,10 +9,10 @@ local function UpdatePosition(i, chatFrame)
   if i == 1 then
     chatFrame:ClearAllPoints()
     chatFrame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', 8, 32)
-  elseif i == 3 then
+  elseif i == 4 then
     chatFrame:ClearAllPoints()
     local xOffset = 10 + 45 - 7 + 45
-    chatFrame:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -xOffset, 32)
+    chatFrame:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -xOffset, 90)
   end
   FCF_SavePositionAndDimensions(chatFrame)
   FCF_StopDragging(chatFrame)
@@ -44,13 +44,14 @@ local function SetupChat()
   FCF_SetLocked(ChatFrame2, 1)
 
   FCF_OpenNewWindow(LOOT)
-  FCF_UnDockFrame(ChatFrame3)
-  FCF_SetLocked(ChatFrame3, 1)
-  ChatFrame3:Show()
-  ChatFrame3.buttonFrame:SetScript('OnShow', function(self)
-    self:Hide()
-  end)
-  ChatFrame3.buttonFrame:Hide()
+  FCF_UnDockFrame(ChatFrame4)
+  FCF_SetLocked(ChatFrame4, 1)
+  ChatFrame4:Show()
+
+  -- ChatFrame4.buttonFrame:SetScript('OnShow', function(self)
+  --   self:Hide()
+  -- end)
+  -- ChatFrame4.buttonFrame:Hide()
 
   for i = 1, NUM_CHAT_WINDOWS do
     local chatFrameName = 'ChatFrame' .. i
@@ -58,27 +59,6 @@ local function SetupChat()
     local name, size, r, g, b, alpha, shown, locked, docked, uninteractable = GetChatWindowInfo(i);
 
     FCF_SetChatWindowFontSize(nil, chatFrame, 12)
-
-    -- Remove Screen Clamping
-    chatFrame:SetClampRectInsets(0, 0, 0, 0)
-    chatFrame:SetMinResize(100, 50)
-    chatFrame:SetMaxResize(UIParent:GetWidth(), UIParent:GetHeight())
-
-    -- Style Tab Fonts
-    local tab = _G[chatFrameName..'Tab'];
-    local tabFont = tab:GetFontString();
-    tab:SetAlpha(1)
-    tabFont:SetFont(ZERO_UI_FONT, FontSize, 'THINOUTLINE');
-    tabFont:SetShadowOffset( 1, -1 );
-    tabFont:SetShadowColor( 0, 0, 0, 0.6 );
-
-    --Hide Tab Backgrounds
-    _G[chatFrameName..'TabLeft']:SetTexture( nil );
-    _G[chatFrameName..'TabMiddle']:SetTexture( nil );
-    _G[chatFrameName..'TabRight']:SetTexture( nil );
-    _G[chatFrameName..'TabSelectedLeft']:SetTexture(nil)
-    _G[chatFrameName..'TabSelectedMiddle']:SetTexture(nil)
-    _G[chatFrameName..'TabSelectedRight']:SetTexture(nil)
 
     -- Stop Chat Arrows Coming Back
     _G[chatFrameName..'ButtonFrame']:Hide();
@@ -116,7 +96,7 @@ local function SetupChat()
       FCF_SetWindowName(chatFrame, GENERAL)
     elseif i == 2 then
       FCF_SetWindowName(chatFrame, GUILD_EVENT_LOG)
-    elseif i == 3 then
+    elseif i == 4 then
       FCF_SetWindowName(chatFrame, LOOT ..' / '..TRADE)
     end
   end
@@ -156,18 +136,18 @@ local function SetupChat()
   ChatFrame_AddMessageGroup(ChatFrame1, 'BN_INLINE_TOAST_ALERT')
 
 
-  ChatFrame_RemoveAllMessageGroups(ChatFrame3)
-  -- ChatFrame_AddMessageGroup(ChatFrame3, 'COMBAT_FACTION_CHANGE')
-  ChatFrame_AddMessageGroup(ChatFrame3, 'SKILL')
-  ChatFrame_AddMessageGroup(ChatFrame3, 'LOOT')
-  ChatFrame_AddMessageGroup(ChatFrame3, 'MONEY')
-  ChatFrame_AddMessageGroup(ChatFrame3, 'COMBAT_XP_GAIN')
-  ChatFrame_AddMessageGroup(ChatFrame3, 'COMBAT_HONOR_GAIN')
-  ChatFrame_AddMessageGroup(ChatFrame3, 'COMBAT_GUILD_XP_GAIN')
-  ChatFrame_AddMessageGroup(ChatFrame3, 'CURRENCY')
+  ChatFrame_RemoveAllMessageGroups(ChatFrame4)
+  --ChatFrame_AddMessageGroup(ChatFrame4, 'COMBAT_FACTION_CHANGE')
+  ChatFrame_AddMessageGroup(ChatFrame4, 'SKILL')
+  ChatFrame_AddMessageGroup(ChatFrame4, 'LOOT')
+  ChatFrame_AddMessageGroup(ChatFrame4, 'MONEY')
+  ChatFrame_AddMessageGroup(ChatFrame4, 'COMBAT_XP_GAIN')
+  ChatFrame_AddMessageGroup(ChatFrame4, 'COMBAT_HONOR_GAIN')
+  ChatFrame_AddMessageGroup(ChatFrame4, 'COMBAT_GUILD_XP_GAIN')
+  ChatFrame_AddMessageGroup(ChatFrame4, 'CURRENCY')
   ChatFrame_AddChannel(ChatFrame1, GENERAL)
   ChatFrame_RemoveChannel(ChatFrame1, 'Trade')
-  ChatFrame_AddChannel(ChatFrame3, 'Trade')
+  ChatFrame_AddChannel(ChatFrame4, 'Trade')
 
 
   ToggleChatColorNamesByClassGroup(true, 'SAY')

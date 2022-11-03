@@ -47,7 +47,7 @@ function module:ProcessFaction(i, dump)
       message = ('|cFF7F7FFF%s (Total: %d, Left: %d)'):format(message, barValue - faction.initalReputation, left)
       self:Print(message)
     end
-    if UnitLevel('player') == 120 and barValue ~= faction.reputation and i ~= self.watchedFaction then
+    if UnitLevel('player') == 60 and barValue ~= faction.reputation and i ~= self.watchedFaction then
       SetWatchedFactionIndex(i)
     end
 
@@ -75,8 +75,8 @@ function module:Print(...)
 end
 
 function module:OnPlayerLogin()
-  if ChatFrame3 and ChatFrame3:IsShown() then
-    self.chatFrame = ChatFrame3
+  if ChatFrame4 and ChatFrame4:IsShown() then
+    self.chatFrame = ChatFrame4
   else
     self.chatFrame = ChatFrame1
   end

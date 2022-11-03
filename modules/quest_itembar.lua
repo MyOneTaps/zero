@@ -2,7 +2,7 @@ local _, Zero = ...
 
 local UPDATE_DELAY = 0.25
 
-local ANCHOR = { 'BOTTOMLEFT', 'ChatFrame3', 'TOPLEFT', 24, 24 }
+local ANCHOR = { 'BOTTOMLEFT', 'ChatFrame4', 'TOPLEFT', 24, 24 }
 local BUTTONS_PER_ROW = 6
 local AUTO_KEYBIND_KEY = 'BUTTON4'
 local BUTTON_SIZE = 30
@@ -242,7 +242,7 @@ local function CreateButtons()
     elseif i % BUTTONS_PER_ROW == 1 then
       buttons[i]:SetPoint('BOTTOM', buttons[i - BUTTONS_PER_ROW], 'TOP', 0, 2)
     else
-      buttons[i]:SetPoint('LEFT', buttons[i - 1], 'RIGHT', -2, 0)
+      buttons[i]:SetPoint('LEFT', buttons[i - 1], 'RIGHT', 4, 0)
     end
   end
   return buttons

@@ -316,6 +316,14 @@ do
     -- do nothing
   end
 
+  function prototype:OnPlayerLogout()
+    -- do nothing
+  end
+
+  function prototype:OnVariablesLoaded()
+    -- do nothing
+  end
+
   function prototype:RegisterChatCommand(command, f)
     local name = 'ZERO_CMD_' .. command:upper()
 
@@ -351,19 +359,32 @@ local function Zero_OnAddOnLoaded(name)
       module:OnAddOnLoaded(name)
     end
   end
-  wipe(modules)
 end
 
 local function Zero_OnPlayerLogin()
   for _, module in ipairs(loadedModules) do
     module:OnPlayerLogin()
   end
+end
+
+local function Zero_OnPlayerLogout()
+  for _, module in ipairs(loadedModules) do
+    module:OnPlayerLogout()
+  end
   wipe(loadedModules)
+end
+
+local function Zero_OnVariablesLoaded()
+  for _, module in ipairs(loadedModules) do
+    module:OnVariablesLoaded()
+  end
 end
 
 local eventCallbacks = {
   ADDON_LOADED = Zero_OnAddOnLoaded,
   PLAYER_LOGIN = Zero_OnPlayerLogin,
+  PLAYER_LOGOUT = Zero_OnPlayerLogout,
+  VARIABLES_LOADED = Zero_OnVariablesLoaded
 }
 
 local function Zero_OnEvent(_, event, ...)

@@ -6,6 +6,7 @@ local MIN_ITEM_LEVEL = 800
 local GRANTS_ARTIFACT_POWER = "Grants [,%d]+ Artifact Power"
 local GAIN_ANCIENT_MANA = "Gain [,%d]+ Ancient Mana"
 local ITEM_LEVEL = "Item Level (%d+)"
+local EQUIPMENT_SETS = "Equipment Sets:"
 
 local tooltip = CreateFrame('GameTooltip', 'ZeroItemsScanToolTip', UIParent, 'GameTooltipTemplate')
 local tooltip_lines = setmetatable({}, {
@@ -16,7 +17,7 @@ local tooltip_lines = setmetatable({}, {
 })
 
 local function CheckItem(bag, slot)
-  local is_soulbound, item_level
+  local is_soulbound, item_level, is_in_equipment_set
   GameTooltip_SetDefaultAnchor(tooltip, UIParent)
   tooltip:SetBagItem(bag, slot)
   for i = 1, tooltip:NumLines() do
@@ -24,6 +25,8 @@ local function CheckItem(bag, slot)
     if text then
       if text:match(ITEM_SOULBOUND) then
         is_soulbound = true
+      elseif text:match(EQUIPMENT_SETS) then
+        is_in_equipment_set = true
       else
         local t = text:match(ITEM_LEVEL)
         if t then
@@ -33,7 +36,7 @@ local function CheckItem(bag, slot)
     end
   end
   tooltip:Hide()
-  return is_soulbound,item_level
+  return is_soulbound,item_level, is_in_equipment_set
 end
 
 local function GetMark(button)
@@ -81,12 +84,13 @@ local function GetItemLevel(bag, slot)
 end
 
 local function UpdateItemButton(button)
-  local bag = button:GetParent():GetID()
-  local slot = button:GetID()
+  local slot, bag = button:GetSlotAndBagID()
 
-  local is_soulbound, item_level = CheckItem(bag, slot)
+  local is_soulbound, item_level, is_in_equipment_set = CheckItem(bag, slot)
   if C_NewItems.IsNewItem(bag, slot) then
     ShowMark(button, 0, 1, 0)
+  elseif is_in_equipment_set then
+    ShowMark(button, 0.5, 1, 1)
   elseif is_soulbound then
     ShowMark(button, 1, 0.5, 0)
   else
@@ -102,18 +106,15 @@ end
 
 function module:UpdateContainerFrame(frame)
   local name = frame:GetName()
-  for i = 1, frame.size do
-    UpdateItemButton(_G[name .. 'Item' .. i])
+  local numBagSlots = ContainerFrame_GetContainerNumSlots(frame:GetID())
+  for i = 1, numBagSlots do
+    UpdateItemButton(frame.Items[i])
   end
 end
 
 function module:UpdateBag(bag)
-  for i = 1, NUM_CONTAINER_FRAMES do
-    local frame = _G['ContainerFrame' .. i]
-    if frame:GetID() == bag and frame:IsShown() then
-      module:UpdateContainerFrame(frame)
-    end
-  end
+  local containerFrame = UIParent.ContainerFrames[bag + 1]
+  module:UpdateContainerFrame(containerFrame)
 end
 
 local function ContainerFrame_OnShow(frame)

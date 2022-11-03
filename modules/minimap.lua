@@ -24,7 +24,7 @@ function module:UpdateMinimapCoords()
 
   local x, y = GetPlayerPosition()
   if x then
-    self.coords.text:SetFormattedText('%1.1f : %1.1f', x, y)
+    self.coords.text:SetFormattedText('%1.1f %1.1f', x, y)
   else
     self.coords.text:SetText('')
   end
@@ -44,9 +44,9 @@ function module:OnLoad()
     end
   end)
 
-  local coords = CreateFrame('Frame', 'Zero_coords', Minimap)
+  local coords = CreateFrame('Frame', 'Zero_coords')
   coords:SetSize(100, 16)
-  coords:SetPoint('TOP', 0, -10)
+  coords:SetPoint('TOP', 0, -50)
   coords.text = coords:CreateFontString(nil, 'OVERLAY', 'GameFontWhiteSmall')
   coords.text:SetPoint('CENTER')
   self.coords = coords

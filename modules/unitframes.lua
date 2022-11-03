@@ -3,11 +3,11 @@ local _, Zero = ...
 local module = Zero.Module('UnitFrames')
 
 local function SetUnitFrame(frame, x, y)
-  frame:SetMovable(true)
-  frame:ClearAllPoints();
-  frame:SetUserPlaced(true);
-  frame:SetPoint('BOTTOM', x, y)
-  frame:SetMovable(false)
+  if not frame:IsUserPlaced() then
+    frame:ClearAllPoints()
+    frame:SetPoint('BOTTOM', x, y)
+    frame:SetUserPlaced(true)
+  end
 end
 
 function module:UpdateUnitFrames()
@@ -20,6 +20,6 @@ function module:OnLoad()
   self:UpdateUnitFrames()
 end
 
-function module:OnPlayerLogin()
+function module:OnVariablesLoaded()
   self:SafeInvoke('UpdateUnitFrames')
 end
