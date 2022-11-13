@@ -9,10 +9,6 @@ local function UpdatePosition(i, chatFrame)
   if i == 1 then
     chatFrame:ClearAllPoints()
     chatFrame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', 8, 32)
-  elseif i == 4 then
-    chatFrame:ClearAllPoints()
-    local xOffset = 10 + 45 - 7 + 45
-    chatFrame:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -xOffset, 90)
   end
   FCF_SavePositionAndDimensions(chatFrame)
   FCF_StopDragging(chatFrame)
@@ -39,57 +35,69 @@ local function SetupChat()
   ChatFontNormal:SetShadowColor(0,0,0,0.6)
 
   FCF_ResetChatWindows()
+  FCF_Close(ChatFrame3)
   FCF_SetLocked(ChatFrame1, 1)
   FCF_DockFrame(ChatFrame2)
   FCF_SetLocked(ChatFrame2, 1)
-
   FCF_OpenNewWindow(LOOT)
-  FCF_UnDockFrame(ChatFrame4)
+  FCF_DockFrame(ChatFrame4)
   FCF_SetLocked(ChatFrame4, 1)
-  ChatFrame4:Show()
-
-  -- ChatFrame4.buttonFrame:SetScript('OnShow', function(self)
-  --   self:Hide()
-  -- end)
-  -- ChatFrame4.buttonFrame:Hide()
 
   for i = 1, NUM_CHAT_WINDOWS do
     local chatFrameName = 'ChatFrame' .. i
+
     local chatFrame = _G[chatFrameName]
-    local name, size, r, g, b, alpha, shown, locked, docked, uninteractable = GetChatWindowInfo(i);
+    local name, size, r, g, b, alpha, shown, locked, docked, uninteractable = GetChatWindowInfo(i)
 
     FCF_SetChatWindowFontSize(nil, chatFrame, 12)
 
+    local tab = _G[chatFrameName..'Tab']
+    local tabFont = tab:GetFontString()
+    tab:SetAlpha(1)
+    tabFont:SetFont(ZERO_UI_FONT, FontSize, 'THINOUTLINE')
+    tabFont:SetShadowOffset( 1, -1 )
+    tabFont:SetShadowColor( 0, 0, 0, 0.6 )
+
+    --Hide Tab Backgrounds
+    tab.Left:SetTexture(nil)
+    tab.Middle:SetTexture(nil)
+    tab.Right:SetTexture(nil)
+    tab.HighlightLeft:SetTexture(nil)
+    tab.HighlightMiddle:SetTexture(nil)
+    tab.HighlightRight:SetTexture(nil)
+    tab.ActiveLeft:SetTexture(nil)
+    tab.ActiveMiddle:SetTexture(nil)
+    tab.ActiveRight:SetTexture(nil)
+
     -- Stop Chat Arrows Coming Back
-    _G[chatFrameName..'ButtonFrame']:Hide();
-    _G[chatFrameName..'ButtonFrame']:HookScript('OnShow', _G[chatFrameName..'ButtonFrame'].Hide);
+    _G[chatFrameName..'ButtonFrame']:Hide()
+    _G[chatFrameName..'ButtonFrame']:HookScript('OnShow', _G[chatFrameName..'ButtonFrame'].Hide)
 
     -- Skin Edit Text Box
-    _G[chatFrameName..'EditBoxLeft']:Hide();
-    _G[chatFrameName..'EditBoxMid']:Hide();
-    _G[chatFrameName..'EditBoxRight']:Hide();
+    _G[chatFrameName..'EditBoxLeft']:Hide()
+    _G[chatFrameName..'EditBoxMid']:Hide()
+    _G[chatFrameName..'EditBoxRight']:Hide()
 
     -- Allow arrow keys in Edit Box
-    _G[chatFrameName..'EditBox']:SetAltArrowKeyMode(false);
+    _G[chatFrameName..'EditBox']:SetAltArrowKeyMode(false)
 
     -- Position Edit Box
-    _G[chatFrameName..'EditBox']:ClearAllPoints();
+    _G[chatFrameName..'EditBox']:ClearAllPoints()
     if(chatFrameName == 'ChatFrame2') then -- Kind hacky. Fixes positioning of its a combat log entry
-    _G[chatFrameName..'EditBox']:SetPoint('BOTTOM',_G[chatFrameName],'TOP',0,44);
+    _G[chatFrameName..'EditBox']:SetPoint('BOTTOM',_G[chatFrameName],'TOP',0,44)
     else
-      _G[chatFrameName..'EditBox']:SetPoint('BOTTOM',_G[chatFrameName],'TOP',0,22);
+      _G[chatFrameName..'EditBox']:SetPoint('BOTTOM',_G[chatFrameName],'TOP',0,22)
     end
-    _G[chatFrameName..'EditBox']:SetPoint('LEFT',_G[chatFrameName],-5,0);
-    _G[chatFrameName..'EditBox']:SetPoint('RIGHT',_G[chatFrameName],10,0);
+    _G[chatFrameName..'EditBox']:SetPoint('LEFT',_G[chatFrameName],-5,0)
+    _G[chatFrameName..'EditBox']:SetPoint('RIGHT',_G[chatFrameName],10,0)
 
     -- Change Chat Font
-    _G[chatFrameName]:SetFont(ZERO_CHAT_FONT, FontSize, 'THINOUTLINE');
-    _G[chatFrameName]:SetShadowOffset( 1, -1 );
+    _G[chatFrameName]:SetFont(ZERO_CHAT_FONT, FontSize, 'THINOUTLINE')
+    _G[chatFrameName]:SetShadowOffset( 1, -1 )
     _G[chatFrameName]:SetShadowColor( 0, 0, 0, 0.6 )
 
     -- rename windows general because moved to chat #3
     chatFrame:SetSize(430, 120)
-
     UpdatePosition(i, chatFrame)
 
     if i == 1 then
