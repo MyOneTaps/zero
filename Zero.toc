@@ -26,8 +26,8 @@ modules\loot.lua
 # modules\minimap.lua
 #modules\nameplates.lua
 modules\quest_sounds.lua
-modules\quest_itembar.lua
-modules\quest_tracker.lua
+#modules\quest_itembar.lua
+#modules\quest_tracker.lua
 modules\repair.lua
 modules\reputation.lua
 modules\resurrect.lua
