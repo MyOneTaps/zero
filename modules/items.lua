@@ -8,6 +8,9 @@ local GAIN_ANCIENT_MANA = "Gain [,%d]+ Ancient Mana"
 local ITEM_LEVEL = "Item Level (%d+)"
 local EQUIPMENT_SETS = "Equipment Sets:"
 
+local marks = {}
+local item_levels = {}
+
 local tooltip = CreateFrame('GameTooltip', 'ZeroItemsScanToolTip', UIParent, 'GameTooltipTemplate')
 local tooltip_lines = setmetatable({}, {
   __index = function(self, i)
@@ -39,47 +42,56 @@ local function CheckItem(bag, slot)
   return is_soulbound,item_level, is_in_equipment_set
 end
 
-local function GetMark(button)
-  if not button.mark then
-    button.mark = button:CreateFontString(button:GetName() .. 'Mark', 'OVERLAY', 'NumberFontNormal')
-    button.mark:SetPoint('TOPRIGHT', 0, 0)
-    button.mark:SetText('●')
+local function GetMarkDecoration(button)
+  local id = button:GetID()
+  if not marks[id] then
+    marks[id] = button:CreateFontString(button:GetName() .. 'Mark', 'OVERLAY', 'NumberFontNormal')
+    marks[id]:SetPoint('TOPRIGHT', 0, 0)
+    marks[id]:SetText('●')
   end
-  return button.mark
+  return marks[id]
+end
+
+local function GetItemLevelDecoration(button)
+  local id = button:GetID()
+  if not item_levels[id] then
+    item_levels[id] = button:CreateFontString(button:GetName() .. 'ItemLevel', 'OVERLAY', 'NumberFontNormalSmall')
+    item_levels[id]:SetPoint('BOTTOMLEFT', 4, 4)
+  end
+  return item_levels[id]
 end
 
 local function ShowItemLevel(button, level)
-  if not button.item_level then
-    button.item_level = button:CreateFontString(button:GetName() .. 'ItemLevel', 'OVERLAY', 'NumberFontNormalSmall')
-    button.item_level:SetPoint('BOTTOMLEFT', 4, 4)
-  end
-  button.item_level:SetText(level)
-  button.item_level:Show()
+  local item_level = GetItemLevelDecoration(button)
+  item_level:SetText(level)
+  item_level:Show()
 end
 
 local function HideItemLevel(button)
-  if button.item_level then
-    button.item_level:Hide()
+  local id = button:GetID()
+  if item_levels[id] then
+    item_levels[id]:Hide()
   end
 end
 
 local function ShowMark(button, r, g, b)
-  local mark = GetMark(button)
+  local mark = GetMarkDecoration(button)
   mark:SetVertexColor(r, g, b, 1)
   mark:Show()
 end
 
 local function HideMark(button)
-  if button.mark then
-    button.mark:Hide()
+  local id = button:GetID()
+  if marks[id] then
+    marks[id]:Hide()
   end
 end
 
 local function GetItemLevel(bag, slot)
   local item_id = GetContainerItemID(bag, slot)
   if item_id then
-    local _, _, _, item_level, _, _, _, _, itemEquipLoc = GetItemInfo(item_id)
-    return itemEquipLoc ~= '' and item_level
+    local _, _, _, item_level, _, _, _, _, item_equip_loc = GetItemInfo(item_id)
+    return item_equip_loc ~= '' and item_level
   end
 end
 
