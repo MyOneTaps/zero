@@ -2,7 +2,13 @@ local _, Zero = ...
 
 local module = Zero.Module('SellJunk')
 
+local GetContainerNumSlots = C_Container and C_Container.GetContainerNumSlots or GetContainerNumSlots
+local GetContainerItemLink = C_Container and C_Container.GetContainerItemLink or GetContainerItemLink
+local GetContainerItemInfo = C_Container and C_Container.GetContainerItemInfo or GetContainerItemInfo
+local UseContainerItem = C_Container and C_Container.UseContainerItem or UseContainerItem
+
 local merchantFrameShown = false
+
 
 local function GetJunk()
   local items = {}
@@ -11,12 +17,18 @@ local function GetJunk()
       local itemLink = GetContainerItemLink(bag, slot)
       if itemLink then
         local _, _, quality, _, _, _, _, _, _, _, price = GetItemInfo(itemLink)
-        local _, count = GetContainerItemInfo(bag, slot)
+        local itemCount
+        if Zero.IsRetail then
+          local info = GetContainerItemInfo(bag, slot)
+          itemCount = info.stackCount
+        else
+          itemCount = select(2, GetContainerItemInfo(bag, slot))
+        end
         if quality == 0 then
           items[#items+1] = {
             bag = bag,
             slot = slot,
-            count = count,
+            count = itemCount,
             price = price,
           }
         end

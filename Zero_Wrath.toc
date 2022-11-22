@@ -1,4 +1,4 @@
-## Interface: 100002
+## Interface: 30400
 ## Title: Zero
 ## Notes: General improvements to the default Blizzard UI
 ## Version: 0.1
@@ -21,17 +21,13 @@ modules\errors.lua
 modules\fct.lua
 modules\fishing.lua
 modules\fonts.lua
-modules\items.lua
 modules\loot.lua
 modules\minimap.lua
-#modules\nameplates.lua
 modules\quest_sounds.lua
-#modules\quest_itembar.lua
-#modules\quest_tracker.lua
 modules\repair.lua
 modules\reputation.lua
 modules\resurrect.lua
 modules\screenshots.lua
 modules\selljunk.lua
 modules\tooltip.lua
-# modules\unitframes.lua
+modules\unitframes.lua

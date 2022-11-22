@@ -2,16 +2,14 @@ local _, Zero = ...
 
 local module = Zero.Module('Items')
 
-local MIN_ITEM_LEVEL = 800
-local GRANTS_ARTIFACT_POWER = "Grants [,%d]+ Artifact Power"
-local GAIN_ANCIENT_MANA = "Gain [,%d]+ Ancient Mana"
-local ITEM_LEVEL = "Item Level (%d+)"
 local EQUIPMENT_SETS = "Equipment Sets:"
+local MIN_ITEM_QUALITY = Enum.ItemQuality.Uncommon
 
 local marks = {}
 local item_levels = {}
 
 local tooltip = CreateFrame('GameTooltip', 'ZeroItemsScanToolTip', UIParent, 'GameTooltipTemplate')
+tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
 local tooltip_lines = setmetatable({}, {
   __index = function(self, i)
     self[i] = _G['ZeroItemsScanToolTipTextLeft' .. i]
@@ -19,33 +17,30 @@ local tooltip_lines = setmetatable({}, {
   end
 })
 
-local function CheckItem(bag, slot)
-  local is_soulbound, item_level, is_in_equipment_set
-  GameTooltip_SetDefaultAnchor(tooltip, UIParent)
-  tooltip:SetBagItem(bag, slot)
+local function IsBound(item)
+  local location = item:GetItemLocation()
+  ItemLocation:ApplyLocationToTooltip(location, tooltip)
   for i = 1, tooltip:NumLines() do
     local text = tooltip_lines[i]:GetText()
     if text then
       if text:match(ITEM_SOULBOUND) then
-        is_soulbound = true
-      elseif text:match(EQUIPMENT_SETS) then
-        is_in_equipment_set = true
-      else
-        local t = text:match(ITEM_LEVEL)
-        if t then
-          item_level = t
-        end
+        return true
       end
     end
   end
   tooltip:Hide()
-  return is_soulbound,item_level, is_in_equipment_set
+  return false
+end
+
+local function GetUniqueID(button)
+  local bag_id, id = button:GetBagID(), button:GetID()
+  return bag_id * 1000 + id
 end
 
 local function GetMarkDecoration(button)
-  local id = button:GetID()
+  local id = GetUniqueID(button)
   if not marks[id] then
-    marks[id] = button:CreateFontString(button:GetName() .. 'Mark', 'OVERLAY', 'NumberFontNormal')
+    marks[id] = button:CreateFontString(button:GetName() .. 'Mark', 'OVERLAY', 'NumberFontNormalLarge')
     marks[id]:SetPoint('TOPRIGHT', 0, 0)
     marks[id]:SetText('●')
   end
@@ -53,7 +48,7 @@ local function GetMarkDecoration(button)
 end
 
 local function GetItemLevelDecoration(button)
-  local id = button:GetID()
+  local id = GetUniqueID(button)
   if not item_levels[id] then
     item_levels[id] = button:CreateFontString(button:GetName() .. 'ItemLevel', 'OVERLAY', 'NumberFontNormalSmall')
     item_levels[id]:SetPoint('BOTTOMLEFT', 4, 4)
@@ -68,7 +63,7 @@ local function ShowItemLevel(button, level)
 end
 
 local function HideItemLevel(button)
-  local id = button:GetID()
+  local id = GetUniqueID(button)
   if item_levels[id] then
     item_levels[id]:Hide()
   end
@@ -81,7 +76,7 @@ local function ShowMark(button, r, g, b)
 end
 
 local function HideMark(button)
-  local id = button:GetID()
+  local id = GetUniqueID(button)
   if marks[id] then
     marks[id]:Hide()
   end
@@ -95,66 +90,48 @@ local function GetItemLevel(bag, slot)
   end
 end
 
-local function UpdateItemButton(button)
+local function ShouldShowOnItem(item)
+  local quality = item:GetItemQuality()
+  if quality < MIN_ITEM_QUALITY then
+      return false
+  end
+  local _, _, _, _, _, item_class, _ = GetItemInfoInstant(item:GetItemID())
+  return item_class == Enum.ItemClass.Weapon or item_class == Enum.ItemClass.Armor
+end
+
+local function UpdateContainerButton(button)
+  HideMark(button)
+  HideItemLevel(button)
+
   local slot, bag = button:GetSlotAndBagID()
+  local item = Item:CreateFromBagAndSlot(bag, slot)
 
-  local is_soulbound, item_level, is_in_equipment_set = CheckItem(bag, slot)
-  if C_NewItems.IsNewItem(bag, slot) then
-    ShowMark(button, 0, 1, 0)
-  elseif is_in_equipment_set then
-    ShowMark(button, 0.5, 1, 1)
-  elseif is_soulbound then
-    ShowMark(button, 1, 0.5, 0)
-  else
-    HideMark(button)
-  end
+  if item:IsItemEmpty() then return end
 
-  if item_level then
+  item:ContinueOnItemLoad(function()
+    if not ShouldShowOnItem(item) then return end
+
+    local item_level = item:GetCurrentItemLevel()
     ShowItemLevel(button, item_level)
-  else
-    HideItemLevel(button)
+    if C_NewItems.IsNewItem(bag, slot) then
+      ShowMark(button, 0, 1, 0)
+    elseif C_Container.GetContainerItemEquipmentSetInfo(bag, slot) then
+      ShowMark(button, 0.5, 1, 1)
+    elseif IsBound(item) then
+      ShowMark(button, 1, 0.5, 0)
+    end
+  end)
+end
+
+local function UpdateContainerFrame(frame)
+  for _, button in frame:EnumerateValidItems() do
+      UpdateContainerButton(button)
   end
-end
-
-function module:UpdateContainerFrame(frame)
-  local name = frame:GetName()
-  local numBagSlots = ContainerFrame_GetContainerNumSlots(frame:GetID())
-  for i = 1, numBagSlots do
-    UpdateItemButton(frame.Items[i])
-  end
-end
-
-function module:UpdateBag(bag)
-  local containerFrame = UIParent.ContainerFrames[bag + 1]
-  module:UpdateContainerFrame(containerFrame)
-end
-
-local function ContainerFrame_OnShow(frame)
-  module:UpdateContainerFrame(frame)
-end
-
-local function ContainerFrame_OnHide(frame)
-  local bag = frame:GetID()
-  for i = 1, frame.size do
-     C_NewItems.RemoveNewItem(bag, i)
-  end
-end
-
-function module:BAG_UPDATE(bag)
-  self.updatedBags[bag] = true
-end
-
-function module:BAG_UPDATE_DELAYED()
-  for bag in pairs(self.updatedBags) do
-    self:UpdateBag(bag)
-  end
-  wipe(self.updatedBags)
 end
 
 function module:OnPlayerLogin()
-  self.updatedBags = {}
-  self:RegisterEvent('BAG_UPDATE')
-  self:RegisterEvent('BAG_UPDATE_DELAYED')
-  hooksecurefunc('ContainerFrame_OnShow', ContainerFrame_OnShow)
-  hooksecurefunc('ContainerFrame_OnHide', ContainerFrame_OnHide)
+  hooksecurefunc(ContainerFrameCombinedBags, 'UpdateItems', UpdateContainerFrame)
+  for _, frame in ipairs(UIParent.ContainerFrames) do
+    hooksecurefunc(frame, 'UpdateItems', UpdateContainerFrame)
+  end
 end

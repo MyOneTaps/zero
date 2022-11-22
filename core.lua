@@ -409,3 +409,7 @@ function Zero.FormatMoney(c)
   s, c = floor(c / 100 ), c % 100
   return ('|cffffffff%dg |cffffffff%ss |cffffffff%dc.'):format(g, s, c)
 end
+
+Zero.TocVersion = select(4, GetBuildInfo())
+Zero.IsClassic = Zero.TocVersion < 40000
+Zero.IsRetail = not Zero.IsClassic

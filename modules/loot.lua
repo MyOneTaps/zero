@@ -27,5 +27,7 @@ end
 function module:OnPlayerLogin()
   self:RegisterEvent('LOOT_OPENED', LootAll)
   self:RegisterEvent('CONFIRM_LOOT_ROLL', ConfirmLoot)
-  self:RegisterEvent('CONFIRM_DISENCHANT_ROLL', ConfirmDisenchantRoll)
+  if Zero.Retail then
+    self:RegisterEvent('CONFIRM_DISENCHANT_ROLL', ConfirmDisenchantRoll)
+  end
 end

@@ -24,8 +24,10 @@ local function SetupChat()
   ChatFrameChannelButton:HookScript('OnShow', ChatFrameMenuButton.Hide)
   ChatFrameChannelButton:Hide()
   local button = QuickJoinToastButton or FriendsMicroButton
-  button:HookScript('OnShow', button.Hide)
-  button:Hide()
+  if button then
+    button:HookScript('OnShow', button.Hide)
+    button:Hide()
+  end
   BNToastFrame:SetClampedToScreen(true)
   BNToastFrame:SetClampRectInsets(-15,15,15,-15)
 
@@ -59,15 +61,24 @@ local function SetupChat()
     tabFont:SetShadowColor( 0, 0, 0, 0.6 )
 
     --Hide Tab Backgrounds
-    tab.Left:SetTexture(nil)
-    tab.Middle:SetTexture(nil)
-    tab.Right:SetTexture(nil)
-    tab.HighlightLeft:SetTexture(nil)
-    tab.HighlightMiddle:SetTexture(nil)
-    tab.HighlightRight:SetTexture(nil)
-    tab.ActiveLeft:SetTexture(nil)
-    tab.ActiveMiddle:SetTexture(nil)
-    tab.ActiveRight:SetTexture(nil)
+    if Zero.IsRetail then
+      tab.Left:SetTexture(nil)
+      tab.Middle:SetTexture(nil)
+      tab.Right:SetTexture(nil)
+      tab.HighlightLeft:SetTexture(nil)
+      tab.HighlightMiddle:SetTexture(nil)
+      tab.HighlightRight:SetTexture(nil)
+      tab.ActiveLeft:SetTexture(nil)
+      tab.ActiveMiddle:SetTexture(nil)
+      tab.ActiveRight:SetTexture(nil)
+    else
+      _G[chatFrameName..'TabLeft']:SetTexture( nil );
+      _G[chatFrameName..'TabMiddle']:SetTexture( nil );
+      _G[chatFrameName..'TabRight']:SetTexture( nil );
+      _G[chatFrameName..'TabSelectedLeft']:SetTexture(nil)
+      _G[chatFrameName..'TabSelectedMiddle']:SetTexture(nil)
+      _G[chatFrameName..'TabSelectedRight']:SetTexture(nil)
+    end
 
     -- Stop Chat Arrows Coming Back
     _G[chatFrameName..'ButtonFrame']:Hide()
