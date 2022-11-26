@@ -2,34 +2,17 @@ local _, Zero = ...
 
 local module = Zero.Module('Items')
 
-local EQUIPMENT_SETS = "Equipment Sets:"
 local MIN_ITEM_QUALITY = Enum.ItemQuality.Uncommon
 
 local marks = {}
 local item_levels = {}
 
-local tooltip = CreateFrame('GameTooltip', 'ZeroItemsScanToolTip', UIParent, 'GameTooltipTemplate')
-tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
-local tooltip_lines = setmetatable({}, {
-  __index = function(self, i)
-    self[i] = _G['ZeroItemsScanToolTipTextLeft' .. i]
-    return self[i]
-  end
-})
-
 local function IsBound(item)
   local location = item:GetItemLocation()
-  ItemLocation:ApplyLocationToTooltip(location, tooltip)
-  for i = 1, tooltip:NumLines() do
-    local text = tooltip_lines[i]:GetText()
-    if text then
-      if text:match(ITEM_SOULBOUND) then
-        return true
-      end
-    end
-  end
-  tooltip:Hide()
-  return false
+  local bag, slot = location:GetBagAndSlot()
+  local info = C_Container.GetContainerItemInfo(bag, slot)
+  print(item:GetItemName(), info.isBound)
+  return info.isBound
 end
 
 local function GetUniqueID(button)
@@ -110,7 +93,6 @@ local function UpdateContainerButton(button)
 
   item:ContinueOnItemLoad(function()
     if not ShouldShowOnItem(item) then return end
-
     local item_level = item:GetCurrentItemLevel()
     ShowItemLevel(button, item_level)
     if C_NewItems.IsNewItem(bag, slot) then
@@ -130,8 +112,11 @@ local function UpdateContainerFrame(frame)
 end
 
 function module:OnPlayerLogin()
-  hooksecurefunc(ContainerFrameCombinedBags, 'UpdateItems', UpdateContainerFrame)
+  hooksecurefunc(ContainerFrameCombinedBags, 'Update', UpdateContainerFrame)
+  hooksecurefunc(ContainerFrameCombinedBags, 'OnShow', UpdateContainerFrame)
+  hooksecurefunc('BankFrame_UpdateItems', UpdateContainerFrame)
+  hooksecurefunc('ContainerFrame_OnShow', UpdateContainerFrame)
   for _, frame in ipairs(UIParent.ContainerFrames) do
-    hooksecurefunc(frame, 'UpdateItems', UpdateContainerFrame)
+    hooksecurefunc(frame, 'Update', UpdateContainerFrame)
   end
 end
