@@ -116,9 +116,11 @@ local function SetupChat()
     elseif i == 2 then
       FCF_SetWindowName(chatFrame, GUILD_EVENT_LOG)
     elseif i == 4 then
-      FCF_SetWindowName(chatFrame, LOOT ..' / '..TRADE)
+      FCF_SetWindowName(chatFrame, LOOT)
     end
   end
+
+  ChatFrame_AddChannel(ChatFrame1, GENERAL)
 
   ChatFrame_RemoveAllMessageGroups(ChatFrame1)
   ChatFrame_AddMessageGroup(ChatFrame1, 'SAY')
@@ -154,9 +156,7 @@ local function SetupChat()
   ChatFrame_AddMessageGroup(ChatFrame1, 'BN_CONVERSATION')
   ChatFrame_AddMessageGroup(ChatFrame1, 'BN_INLINE_TOAST_ALERT')
 
-
   ChatFrame_RemoveAllMessageGroups(ChatFrame4)
-  --ChatFrame_AddMessageGroup(ChatFrame4, 'COMBAT_FACTION_CHANGE')
   ChatFrame_AddMessageGroup(ChatFrame4, 'SKILL')
   ChatFrame_AddMessageGroup(ChatFrame4, 'LOOT')
   ChatFrame_AddMessageGroup(ChatFrame4, 'MONEY')
@@ -164,9 +164,8 @@ local function SetupChat()
   ChatFrame_AddMessageGroup(ChatFrame4, 'COMBAT_HONOR_GAIN')
   ChatFrame_AddMessageGroup(ChatFrame4, 'COMBAT_GUILD_XP_GAIN')
   ChatFrame_AddMessageGroup(ChatFrame4, 'CURRENCY')
-  ChatFrame_AddChannel(ChatFrame1, GENERAL)
-  ChatFrame_RemoveChannel(ChatFrame1, 'Trade')
-  ChatFrame_AddChannel(ChatFrame4, 'Trade')
+  ChatFrame_AddMessageGroup(ChatFrame4, 'TRADESKILLS')
+  ChatFrame_AddMessageGroup(ChatFrame4, 'COMBAT_FACTION_CHANGE')
 
 
   ToggleChatColorNamesByClassGroup(true, 'SAY')
